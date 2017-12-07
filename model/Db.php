@@ -5,7 +5,7 @@
  * User: Piotr
  */
 
-namespace library\Pig\model;
+namespace library\PigFramework\model;
 
 use Zend_Db_Adapter_Mysqli;
 

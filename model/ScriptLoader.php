@@ -6,7 +6,7 @@
  * Time: 21:58
  */
 
-namespace library\Pig\model;
+namespace library\PigFramework\model;
 
 /**
  * Class ScriptLoader

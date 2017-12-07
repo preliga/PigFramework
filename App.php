@@ -5,7 +5,7 @@
  * User: Piotr
  */
 
-use library\Pig\Router;
+use library\PigFramework\Router;
 
 /**
  * Class App

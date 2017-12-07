@@ -5,10 +5,10 @@
  * User: Piotr
  */
 
-namespace library\Pig;
+namespace library\PigFramework;
 
-use library\Pig\model\Config;
-use library\Pig\model\PigException;
+use library\PigFramework\model\Config;
+//use library\PigFramework\model\PigException;
 
 /**
  * Class Router

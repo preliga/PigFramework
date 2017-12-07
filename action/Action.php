@@ -5,9 +5,9 @@
  * User: Piotr
  */
 
-namespace library\Pig\action;
+namespace library\PigFramework\action;
 
-use library\Pig\model\{
+use library\PigFramework\model\{
     Session, Statement, View
 };
 
