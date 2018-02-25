@@ -94,7 +94,7 @@ abstract class Action
     }
 
     /**
-     * @return mixed
+     *
      */
     abstract public function onAction();
 
@@ -143,6 +143,10 @@ abstract class Action
     )
     {
         $this->view->status = $status ? 'success' : 'error';
+
+        if (!empty($message)) {
+            $this->statement->pushStatement($this->view->status, $message);
+        }
         $this->view->message = $message;
 
         if ($this->hasParam('json')) {

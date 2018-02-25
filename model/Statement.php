@@ -28,7 +28,7 @@ class Statement
      */
     private function __construct()
     {
-        $this->statements = [];
+        $this->statements = Session::get('statements') ?? [];
     }
 
     /**
@@ -57,10 +57,13 @@ class Statement
         } else {
             throw new \Exception("Bad message type. Expected string or array.");
         }
+
+        Session::set('statements', $this->statements);
     }
 
     /**
      * @param array $statements
+     * @throws \Exception
      */
     public function pushStatements(array $statements)
     {
@@ -69,26 +72,6 @@ class Statement
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * @param string|null $type
@@ -104,6 +87,8 @@ class Statement
             $this->statements[$type] = [];
         }
 
+        Session::set('statements', $this->statements);
+
         return $statements;
     }
 
@@ -117,5 +102,7 @@ class Statement
         } else {
             $this->statements[$type] = [];
         }
+
+        Session::set('statements', $this->statements);
     }
 }
