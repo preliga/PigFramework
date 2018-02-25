@@ -94,7 +94,7 @@ abstract class Action
     }
 
     /**
-     * @return mixed
+     *
      */
     abstract public function onAction();
 
