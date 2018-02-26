@@ -29,7 +29,7 @@ class App
 //        });
 
         $baseUrl = $_SERVER['HTTP_HOST'] . '/';
-        $url = empty($_SERVER['REDIRECT_URL']) ? '/' : $_SERVER['REDIRECT_URL'];
+        $url = empty($_SERVER['REDIRECT_URL']) ? (empty($_SERVER['REQUEST_URI']) ? '/': $_SERVER['REQUEST_URI']) : $_SERVER['REDIRECT_URL'];
 
         $router = new Router($baseUrl);
         $router->route($url);
