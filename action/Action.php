@@ -157,8 +157,11 @@ abstract class Action
             if (!empty($params)) {
                 $query = '?';
                 foreach ($params as $key => $val) {
-                    $query .= "$key=$val";
+                    $query .= "$key=$val&";
                 }
+
+                $query = substr($query, 0,-1);
+
                 $url .= $query;
             }
 
