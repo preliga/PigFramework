@@ -8,7 +8,7 @@
 namespace library\PigFramework\action;
 
 use library\PigFramework\model\{
-    Session, Statement, View
+    Session, Statement, View, Registry
 };
 
 /**
@@ -33,6 +33,11 @@ abstract class Action
     protected $statement;
 
     /**
+     * @var Registry
+     */
+    protected $registry;
+
+    /**
      * Action constructor.
      * @param string $file
      */
@@ -40,6 +45,8 @@ abstract class Action
     {
         Session::init();
         $this->file = $file;
+
+        $this->registry = Registry::getInstance();
     }
 
     /**
@@ -160,7 +167,7 @@ abstract class Action
                     $query .= "$key=$val&";
                 }
 
-                $query = substr($query, 0,-1);
+                $query = substr($query, 0, -1);
 
                 $url .= $query;
             }
