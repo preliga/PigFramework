@@ -29,7 +29,10 @@ class App
 //        });
 
         $baseUrl = $_SERVER['HTTP_HOST'] . '/';
-        $url = empty($_SERVER['REDIRECT_URL']) ? (empty($_SERVER['REQUEST_URI']) ? '/': $_SERVER['REQUEST_URI']) : $_SERVER['REDIRECT_URL'];
+//        $url = empty($_SERVER['REDIRECT_URL']) ? (empty($_SERVER['REQUEST_URI']) ? '/' : $_SERVER['REQUEST_URI']) : $_SERVER['REDIRECT_URL'];
+
+        $length = strpos($_SERVER['REQUEST_URI'], '?');
+        $url = $length > 0 ? substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) : $_SERVER['REQUEST_URI'];
 
         $router = new Router($baseUrl);
         $router->route($url);
