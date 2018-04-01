@@ -7,7 +7,9 @@
 
 namespace library\PigFramework;
 
+use library\PigFramework\action\Action;
 use library\PigFramework\model\Config;
+
 //use library\PigFramework\model\PigException;
 
 /**
@@ -16,6 +18,16 @@ use library\PigFramework\model\Config;
  */
 class Router
 {
+    /**
+     * @var string
+     */
+    protected $baseUrl;
+
+    /**
+     * @var Action
+     */
+    protected $action;
+
     /**
      * Router constructor.
      * @param string $baseUrl
@@ -31,58 +43,100 @@ class Router
      */
     public function route(string $url)
     {
-        $appPath = Config::getInstance()->getConfig('appPath');
-        $action = null;
-        if (empty($url) || $url == '/' || $url == '/index.php') {
-            $file = "content{$appPath}/index";
-            require "{$file}.php";
-            $action = new \index($file);
-        } else {
+        while (true) {
+            $path = substr($url, 1);
 
-            $array_url = explode("/", $url);
-            $path = "content{$appPath}";
+            $this->action = null;
+            if (empty($path) || $path == '/' || $path == '/index.php') {
+                $appHomePath = Config::getInstance()->getConfig('appHomePath');
+                $actionString = "{$appHomePath}";
+            } else {
+                $appPath = Config::getInstance()->getConfig('appPath');
+                $actionString = "{$appPath}{$path}";
+            }
 
-            foreach ($array_url as $param) {
-                $path = $path . $param;
+            $actionPath = str_replace('\\', '/', $actionString);
+            $actionString = str_replace('/', '\\', $actionString);
 
-                if (is_dir($path)) {
-                    $path .= "/";
-                } else {
-                    try {
-                        require $path . '.php';
-                    } catch (\Exception $e) {
-                        die(var_dump($e));
-                    }
-                    $actionString = "{$param}";
-                    $action = new $actionString($path);
+//            die(var_dump($actionString));
+            
+            require "{$actionPath}.php";
+            $this->action = new $actionString($actionPath, $url);
+
+            if (!empty($this->action)) {
+                $this->action->init();
+                if ($this->action->getURL() != $url) {
+                    $url = $this->action->getURL();
+                    continue;
                 }
-            }
-        }
 
-        if (!empty($action)) {
-            $action->init();
-            $action->permissionBase();
+                $this->action->permissionBase();
+                if ($this->action->getURL() != $url) {
+                    $url = $this->action->getURL();
+                    continue;
+                }
 
-            if (!$action->hasParam('json')) {
-                $action->permissionStandard();
-                $action->preActionStandard();
+                if (!$this->action->hasParam('json')) {
+                    $this->action->permissionStandard();
+                    if ($this->action->getURL() != $url) {
+                        $url = $this->action->getURL();
+                        continue;
+                    }
+
+                    $this->action->preActionStandard();
+                    if ($this->action->getURL() != $url) {
+                        $url = $this->action->getURL();
+                        continue;
+                    }
+
+                } else {
+                    $this->action->permissionJSON();
+                    if ($this->action->getURL() != $url) {
+                        $url = $this->action->getURL();
+                        continue;
+                    }
+
+                    $this->action->preActionJSON();
+                    if ($this->action->getURL() != $url) {
+                        $url = $this->action->getURL();
+                        continue;
+                    }
+                }
+
+                $this->action->preAction();
+                if ($this->action->getURL() != $url) {
+                    $url = $this->action->getURL();
+                    continue;
+                }
+                $this->action->onAction();
+                if ($this->action->getURL() != $url) {
+                    $url = $this->action->getURL();
+                    continue;
+                }
+                $this->action->postAction();
+                if ($this->action->getURL() != $url) {
+                    $url = $this->action->getURL();
+                    continue;
+                }
+                if (!$this->action->hasParam('json')) {
+                    $this->action->render();
+                    if ($this->action->getURL() != $url) {
+                        $url = $this->action->getURL();
+                        continue;
+                    }
+                } else {
+                    $this->action->prepareRequest();
+                    if ($this->action->getURL() != $url) {
+                        $url = $this->action->getURL();
+                        continue;
+                    }
+                }
+
             } else {
-                $action->permissionJSON();
-                $action->preActionJSON();
+                throw new \Exception("Błąd przekierowanie: Action not found");
             }
 
-            $action->preAction();
-            $action->onAction();
-            $action->postAction();
-
-            if (!$action->hasParam('json')) {
-                $action->render();
-            } else {
-                $action->prepareRequest();
-            }
-
-        } else {
-            throw new \Exception("Błąd przekierowanie");
+            break;
         }
     }
 

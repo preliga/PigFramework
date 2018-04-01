@@ -14,36 +14,50 @@ namespace library\PigFramework\model;
  */
 class Session
 {
+    protected static $instance;
+
     /**
-     *
+     * @return Session
      */
-    public static function init()
+    public static function getInstance(): Session
+    {
+        if (empty(self::$instance)) {
+            self::$instance = new Session();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * Session constructor.
+     */
+    public function __construct()
     {
         session_start();
     }
 
     /**
-     * @param string $key
+     * @param $name
      * @param $value
      */
-    public static function set(string $key, $value)
+    public function __set($name, $value)
     {
-        $_SESSION[$key] = $value;
+        $_SESSION[$name] = $value;
     }
 
     /**
-     * @param string $key
-     * @return
+     * @param $name
+     * @return mixed
      */
-    public static function get(string $key)
+    public function __get($name)
     {
-        return $_SESSION[$key] ?? null;
+        return $_SESSION[$name] ?? null;
     }
 
     /**
      *
      */
-    public static function destroy()
+    public function __destruct()
     {
         session_destroy();
     }

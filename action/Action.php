@@ -8,7 +8,7 @@
 namespace library\PigFramework\action;
 
 use library\PigFramework\model\{
-    Session, Statement, View, Registry
+    Registry, Session, Statement, View
 };
 
 /**
@@ -28,6 +28,11 @@ abstract class Action
     protected $file;
 
     /**
+     * @var string
+     */
+    protected $url;
+
+    /**
      * @var Statement
      */
     protected $statement;
@@ -41,12 +46,20 @@ abstract class Action
      * Action constructor.
      * @param string $file
      */
-    public function __construct(string $file)
+    public function __construct(string $file, string $url)
     {
-        Session::init();
         $this->file = $file;
+        $this->url = $url;
 
         $this->registry = Registry::getInstance();
+    }
+
+    /**
+     * @return string
+     */
+    public function getURL()
+    {
+        return $this->url;
     }
 
     /**
@@ -132,6 +145,40 @@ abstract class Action
         ];
 
         $this->view->render($data);
+    }
+
+    public function forward(
+        $url = '/',
+        bool $status = true,
+        string $message = "",
+        array $data = []
+    )
+    {
+        $this->view->status = $status ? 'success' : 'error';
+
+        if (!empty($message)) {
+            $this->statement->pushStatement($this->view->status, $message);
+        }
+        $this->view->message = $message;
+
+        if ($this->hasParam('json')) {
+            $this->view->prepareRequest($data);
+            die();
+        } else {
+
+            if (!empty($params)) {
+                $query = '?';
+                foreach ($params as $key => $val) {
+                    $query .= "$key=$val&";
+                }
+
+                $query = substr($query, 0, -1);
+
+                $url .= $query;
+            }
+        }
+
+        $this->url = $url;
     }
 
     /**

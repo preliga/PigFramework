@@ -24,11 +24,17 @@ class Statement
     protected $statements;
 
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
      * Statement constructor.
      */
     private function __construct()
     {
-        $this->statements = Session::get('statements') ?? [];
+        $this->session = Registry::getInstance()->session;
+        $this->statements = $this->session->statements ?? [];
     }
 
     /**
@@ -58,7 +64,7 @@ class Statement
             throw new \Exception("Bad message type. Expected string or array.");
         }
 
-        Session::set('statements', $this->statements);
+        $this->session->statements = $this->statements;
     }
 
     /**
@@ -87,7 +93,7 @@ class Statement
             $this->statements[$type] = [];
         }
 
-        Session::set('statements', $this->statements);
+        $this->session->statements = $this->statements;
 
         return $statements;
     }
@@ -103,6 +109,6 @@ class Statement
             $this->statements[$type] = [];
         }
 
-        Session::set('statements', $this->statements);
+        $this->session->statements = $this->statements;
     }
 }
