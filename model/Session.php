@@ -33,6 +33,7 @@ class Session
      */
     public function __construct()
     {
+
         session_start();
     }
 
@@ -52,14 +53,6 @@ class Session
     public function __get($name)
     {
         return $_SESSION[$name] ?? null;
-    }
-
-    /**
-     *
-     */
-    public function __destruct()
-    {
-        session_destroy();
     }
 }
 
