@@ -264,7 +264,7 @@ abstract class Action
      */
     public function hasParam($name): bool
     {
-        return !empty($_GET[$name]);
+        return isset($_GET[$name]);
     }
 
     /**
