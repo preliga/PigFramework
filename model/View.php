@@ -103,8 +103,7 @@ class View
     public function prepareRequest(array $data = [])
     {
         if (empty($data)) {
-            $publicVars = create_function('$obj', 'return get_object_vars($obj);');
-            $data = $publicVars($this);
+            $data = get_object_vars($this);
             unset($data['file']);
             unset($data['fileJsExist']);
             unset($data['template']);
@@ -124,8 +123,7 @@ class View
      */
     private function assignVariable(\Smarty $smarty, array $data)
     {
-        $publicVars = create_function('$obj', 'return get_object_vars($obj);');
-        $result = array_merge($publicVars($this), $data);
+        $result = array_merge(get_object_vars($this), $data);
 
         foreach ($result as $key => $var) {
             $smarty->assign($key, $var);
