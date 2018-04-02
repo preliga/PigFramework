@@ -41,29 +41,85 @@ class RouterStandard implements Routable
         $this->baseUrl = $baseUrl;
     }
 
+    public function generateRoutersPaths()
+    {
+        if (
+            !Config::getInstance()->getConfig('enableCreationRoutes')
+            &&
+            file_exists(Config::getInstance()->getConfig('cachePath') . "routes_" . APPLICATION_ENV . ".json")
+        ) {
+            return;
+        }
+
+        function findActions($rootPath, $url, &$routes)
+        {
+            if ($handle = opendir($rootPath)) {
+
+                while (false !== ($entry = readdir($handle))) {
+                    if (in_array($entry, ['.', '..'])) {
+                        continue;
+                    }
+
+                    $path = "{$rootPath}\\{$entry}";
+
+                    if (is_dir($path)) {
+                        findActions($path, "{$url}/{$entry}", $routes);
+                    } else if (strpos($path, 'php')) {
+
+                        $action = substr($path, 0, -4);
+
+                        require_once $path;
+
+                        $rc = new \ReflectionClass($action);
+                        $doc = $rc->getDocComment();
+
+                        if (!empty($doc)) {
+                            $posRoute = strpos($doc, '@Route') + 8;
+                            $length = strpos($doc, '"', $posRoute) - $posRoute;
+                            $route = substr($doc, $posRoute, $length);
+
+                        } else {
+                            $route = substr("{$url}/{$entry}", 0, -4);
+                        }
+
+                        $routes[$route] = [
+                            'file' => $path,
+                            'action' => $action
+                        ];
+                    }
+                }
+                closedir($handle);
+            }
+        }
+
+        $appPath = Config::getInstance()->getConfig('appPath');
+        $appPath = substr($appPath, 0, -1);
+
+        $bsaeUrl = '';
+        $route = [];
+
+        findActions($appPath, $bsaeUrl, $route);
+
+        $routesDefined = json_decode(file_get_contents(Config::getInstance()->getConfig('routesDefined')), true);
+        $route = array_merge($route, $routesDefined);
+
+        $routeFile = Config::getInstance()->getConfig('cachePath') . "routes_" . APPLICATION_ENV . ".json";
+        file_put_contents($routeFile, json_encode($route));
+    }
+
     /**
      * @param string $url
      * @throws \Exception
      */
     public function route(string $url)
     {
+        $this->generateRoutersPaths();
+
         while (true) {
-            $path = substr($url, 1);
+            $route = json_decode(file_get_contents(Config::getInstance()->getConfig('cachePath') . "routes_" . APPLICATION_ENV . ".json"), true);
 
-            $this->action = null;
-            if (empty($path) || $path == '/' || $path == '/index.php') {
-                $appHomePath = Config::getInstance()->getConfig('appHomePath');
-                $actionString = "{$appHomePath}";
-            } else {
-                $appPath = Config::getInstance()->getConfig('appPath');
-                $actionString = "{$appPath}{$path}";
-            }
-
-            $actionPath = str_replace('\\', '/', $actionString);
-            $actionString = str_replace('/', '\\', $actionString);
-
-            require "{$actionPath}.php";
-            $this->action = new $actionString($actionPath, $url);
+            require_once $route[$url]['file'];
+            $this->action = new $route[$url]['action'](substr($route[$url]['file'], 0, -4), $url);
 
             if (!empty($this->action)) {
                 $this->action->init();
