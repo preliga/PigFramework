@@ -100,8 +100,10 @@ class RouterStandard implements Routable
 
         findActions($appPath, $bsaeUrl, $route);
 
-        $routesDefined = json_decode(file_get_contents(Config::getInstance()->getConfig('routesDefined')), true);
-        $route = array_merge($route, $routesDefined);
+        if (file_exists(Config::getInstance()->getConfig('routesDefined'))) {
+            $routesDefined = json_decode(file_get_contents(Config::getInstance()->getConfig('routesDefined')), true);
+            $route = array_merge($route, $routesDefined);
+        }
 
         $routeFile = Config::getInstance()->getConfig('cachePath') . "routes_" . APPLICATION_ENV . ".json";
         file_put_contents($routeFile, json_encode($route));
