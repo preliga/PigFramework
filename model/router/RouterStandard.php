@@ -5,7 +5,7 @@
  * User: Piotr
  */
 
-namespace library\PigFramework;
+namespace library\PigFramework\model\router;
 
 use library\PigFramework\action\Action;
 use library\PigFramework\model\Config;
@@ -16,7 +16,7 @@ use library\PigFramework\model\Config;
  * Class Router
  * @package library\Pig
  */
-class Router
+class RouterStandard implements Routable
 {
     /**
      * @var string
@@ -32,8 +32,12 @@ class Router
      * Router constructor.
      * @param string $baseUrl
      */
-    public function __construct(string $baseUrl)
+    public function __construct(string $baseUrl = null)
     {
+        if (empty($baseUrl)) {
+            $baseUrl = $_SERVER['HTTP_HOST'] . '/';
+        }
+
         $this->baseUrl = $baseUrl;
     }
 
@@ -58,8 +62,6 @@ class Router
             $actionPath = str_replace('\\', '/', $actionString);
             $actionString = str_replace('/', '\\', $actionString);
 
-//            die(var_dump($actionString));
-            
             require "{$actionPath}.php";
             $this->action = new $actionString($actionPath, $url);
 

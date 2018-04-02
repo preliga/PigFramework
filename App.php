@@ -5,21 +5,30 @@
  * User: Piotr
  */
 
-use library\PigFramework\Router;
+namespace library\PigFramework;
+
+use library\PigFramework\model\router\Routable;
 
 /**
  * Class App
  */
 class App
 {
+    /**
+     * @var Routable
+     */
+    protected $router;
+
+    public function __construct(Routable $router)
+    {
+        $this->router = $router;
+    }
+
     public function run()
     {
-        $baseUrl = $_SERVER['HTTP_HOST'] . '/';
-
         $length = strpos($_SERVER['REQUEST_URI'], '?');
-        $url = $length > 0 ? substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?')) : $_SERVER['REQUEST_URI'];
+        $url = $length > 0 ? substr($_SERVER['REQUEST_URI'], 0, $length) : $_SERVER['REQUEST_URI'];
 
-        $router = new Router($baseUrl);
-        $router->route($url);
+        $this->router->route($url);
     }
 }
