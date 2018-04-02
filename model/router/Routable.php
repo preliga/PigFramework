@@ -8,6 +8,10 @@
 
 namespace library\PigFramework\model\router;
 
+/**
+ * Interface Routable
+ * @package library\PigFramework\model\router
+ */
 interface Routable
 {
     public function route(string $url);

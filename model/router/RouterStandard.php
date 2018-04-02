@@ -13,8 +13,8 @@ use library\PigFramework\model\Config;
 //use library\PigFramework\model\PigException;
 
 /**
- * Class Router
- * @package library\Pig
+ * Class RouterStandard
+ * @package library\PigFramework\model\router
  */
 class RouterStandard implements Routable
 {
@@ -141,5 +141,4 @@ class RouterStandard implements Routable
             break;
         }
     }
-
 }
