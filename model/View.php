@@ -58,8 +58,7 @@ class View
         $this->fileJsExist = file_exists("$this->file.js");
 
         $this->template = $template;
-
-        $this->path = explode('/', $file);
+        $this->path = explode(DIRECTORY_SEPARATOR, $file);
 
         $this->status = "success";
         $this->message = "";
